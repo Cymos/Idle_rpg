@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+}
+
+#mineButton {
+    padding: 10px 20px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* Container for XP Bar */
+#xpBarContainer {
+    width: 100%;
+    background-color: #ddd;
+    border: 1px solid #333;
+    margin-top: 10px;
+    height: 20px;
+    position: relative;
+}
+
+/* Actual XP Bar */
+#xpBar {
+    height: 100%;
+    width: 0;
+    background-color: green;
+    transition: width 0.5s ease; /* Smooth transition */
+}
+
+/* Container for Countdown Bar */
+#countdownBarContainer {
+    width: 100%;
+    background-color: #ddd;
+    border: 1px solid #333;
+    margin-top: 20px;
+    height: 20px;
+    position: relative;
+}
+
+/* Actual Countdown Bar */
+#countdownBar {
+    height: 100%;
+    width: 0;
+    background-color: red;
+    transition: width 0.1s linear; /* Smooth transition */
+}

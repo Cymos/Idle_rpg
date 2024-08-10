@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mining Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Mining Simulator</h1>
+    <div id="resources">
+        <p>Gold: <span id="gold">0</span></p>
+        <p>Silver: <span id="silver">0</span></p>
+    </div>
+    <div id="levelinfo">
+        <p>Mining Level: <span id="miningLevel">1</span></p>
+        <p>Mining XP: <span id="miningXP">0</span> / <span id="xpToNextMiningLevel">10</span></span></p>
+        <!-- XP Level Bar -->
+        <div id="xpBarContainer">
+            <div id="xpBar"></div>
+        </div>
+    </div>
+    <!-- Countdown Progress Bar -->
+    <div id="countdownBarContainer">
+        <div id="countdownBar"></div>
+    </div>
+
+    <button id="mineButton">Mine!</button>
+    <br />
+    <div id="actionInfo">
+        <p>Actions: <span id="actions">1</span></p>
+        <button id="buyActionUpgrade">Upgrade Actions (Cost: <span id="actionUpgradeCost">20</span> gold)</button>
+    </div>
+    <h2>Shop</h2>
+    <button id="buyPickaxe">Buy Pickaxe (Cost: 10 Gold)</button>
+    <p>Pickaxe Level: <span id="pickaxeLevel">1</span></p>
+    
+    <script src="script.js"></script>
+</body>
+</html>
