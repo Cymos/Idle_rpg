@@ -7,7 +7,8 @@ let miningLevel = 1;
 let xpToNextMiningLevel = 10;
 let pickaxeLevel = 1;
 let actions = 1; // start with 1 action
-let actionUpgradeCost = 20; // cost to upgrade actions
+let actionUpgradeCost = 5; // cost to upgrade actions
+let isIdleMode = true;
 
 // Update the UI with the current resource counts
 function updateResources() {
@@ -38,11 +39,40 @@ function miningLevelUp() {
     miningLevel++;
     miningXP = 0; // reset xp after levelling up
     xpToNextMiningLevel += 10; // increase the xp needed for the next level
-    alert(`Congratulations! You've reached Mining Level ${miningLevel}!`);
+    showNotification(`Congratulations! You've reached Mining Level ${miningLevel}!`);
+    updateLevelInfo();
 }
+
+function showNotification(message, type = 'success') {
+    const notificationArea = document.getElementById('notificationArea');
+    const notification = document.createElement('div');
+    notification.className = 'notification-' + type;
+    notification.textContent = message;
+    notificationArea.appendChild(notification);
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            notificationArea.removeChild(notification);
+        }, 600); // !! Matches the css transition duration
+    }, 3000);
+}
+
+/* Usage examples:
+showNotification('Congrats! You\'ve reached level 2!');
+showNotification('Not enough gold to buy the tool.', 'warning');
+showNotification('Error processiong the request.', 'error');
+*/
 
 // Simulate the mining process
 function mine() {
+    if (isIdleMode) {
+        idleMine();
+    } else {
+        manualMine();
+    }
+}
+
+function idleMine() {
     // disable the mine button
     const mineButton = document.getElementById('mineButton');
     mineButton.disabled = true;
@@ -85,7 +115,7 @@ function mine() {
 
         if (elapsedTime >= cooldownTime) {
             clearInterval(countdownInterval);
-            mineButton.textContent = 'Mine!';
+            mineButton.textContent = 'Auto';
             mineButton.disabled = false;
             countdownBar.style.width = '0%'; // reset the countdown bar
         } else {
@@ -94,28 +124,64 @@ function mine() {
     }, intervalTime); // update the countdown bar every 100ms
 }
 
-    /*
-    let countdown = cooldownTime / 1000;
-    let countdownWidth = 100;
+function manualMine() {
+    const manualMineButton = document.getElementById('manualMineButton');
+    manualMineButton.disabled = true;
 
-    // countdown feedback
-    mineButton.textContent = `Wait ${countdown} seconds`;
-    countdownBar.style.width = countdownWidth + '%';
+    const cooldownTime = 2000; // Manual mining now has a 2 sec cooldown
+    const intervalTime = 100; // Updates every 0.1 seconds
+    let elapsedTime = 0;
+
+    const goldChance = Math.random();
+    const silverChance = Math.random();
+
+    if (goldChance > 0.8) {
+        gold += pickaxeLevel * miningLevel;
+        gainXP(2)
+    }
+
+    if (silverChance > 0.5) {
+        silver += pickaxeLevel * miningLevel
+        gainXP(1);
+    }
+    updateResources();
+
+    const manualCountdownBar = document.getElementById('manualCountdownBar');
 
     const countdownInterval = setInterval(() => {
-        countdown --;
-        countdownWidth -= 100 / (cooldownTime / 1000); // reduce the width proportionately to the time left
-        
-        if (countdown > 0) {
-            mineButton.textContent = `Wait ${countdown} seconds`;
-            countdownBar.style.width = countdownWidth + '%';
-        } else {
-            mineButton.textContent = 'Mine!';
-            mineButton.disabled = false;
-            countdownBar.style.width = '0%'; // reset the countdown bar
+        elapsedTime += intervalTime;
+        const remainingTime = cooldownTime - elapsedTime;
+        const countdownWidth = (remainingTime / cooldownTime) * 100;
+        manualCountdownBar.style.width = countdownWidth + '%';
+
+        if (elapsedTime >= cooldownTime) {
             clearInterval(countdownInterval);
+            manualMineButton.textContent = 'Mine';
+            manualMineButton.disabled = false;
+            manualCountdownBar.style.width = '0%';
+        } else {
+            manualMineButton.textContent = `Wait ${(remainingTime / 1000).toFixed(1)} seconds`;
         }
-    }, 1000); */
+    }, intervalTime); // update countdown bar every 100ms
+}
+
+function toggleMode() {
+    isIdleMode = !isIdleMode;
+
+    const modeButton = document.getElementById('toggleModeButton');
+    const mineButton = document.getElementById('mineButton');
+    const manualMiningDiv = document.getElementById('manualMining');
+
+    if (isIdleMode) {
+        modeButton.textContent = 'Switch to Manual Mining';
+        mineButton.style.display = 'inline-block';
+        manualMiningDiv.style.display = 'none';
+    } else {
+        modeButton.textContent = 'Switch to Idle Mining';
+        mineButton.style.display = 'none';
+        manualMiningDiv.style.display = 'inline-block';
+    }
+}
 
 function buyPickaxe() {
     const pickaxeCost = 10;
@@ -124,8 +190,9 @@ function buyPickaxe() {
         pickaxeLevel++;
         updateResources();
         updatePickaxeLevel();
+        showNotification('You bought a new pickaxe!', 'success');
     } else {
-        alert("Not enough gold!");
+        showNotification("Not enough gold!", 'warning');
     }
 }
 
@@ -134,11 +201,11 @@ function buyActionUpgrade() {
         gold -= actionUpgradeCost;
         actions++;
         actionUpgradeCost += 2; // increase the cost for the next upgrade
-
         updateResources();
         updateActionInfo();
+        showNotification('You increased your actions', 'success');
     } else {
-        alert('Not enough gold!');
+        showNotification('Not enough gold!', 'warning');
     }
 }
 
@@ -153,5 +220,7 @@ function updatePickaxeLevel() {
 
 // Attach event listeners to the 'Mine' button
 document.getElementById('mineButton').addEventListener('click', mine);
+document.getElementById('manualMineButton').addEventListener('click', mine);
+document.getElementById('toggleModeButton').addEventListener('click', toggleMode);
 document.getElementById('buyPickaxe').addEventListener('click', buyPickaxe);
 document.getElementById('buyActionUpgrade').addEventListener('click', buyActionUpgrade);

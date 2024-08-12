@@ -25,15 +25,29 @@
         <div id="countdownBar"></div>
     </div>
 
-    <button id="mineButton">Mine!</button>
+    <button id="mineButton">Start Mining</button>
+
+    <div id="modeToggle">
+        <button id="toggleModeButton">Switch to Manual Mining</button>
+    </div>
+
+    <div id="manualMining" style="display: none;">
+        <button id="manualMineButton">Click</button>
+        <div id="manualCountdown" class="progress-bar">
+            <div id="manualCountdownBar" class="progress"></div>
+        </div>
+    </div>
+
     <br />
     <div id="actionInfo">
         <p>Actions: <span id="actions">1</span></p>
-        <button id="buyActionUpgrade">Upgrade Actions (Cost: <span id="actionUpgradeCost">20</span> gold)</button>
+        <button id="buyActionUpgrade">Upgrade Actions (Cost: <span id="actionUpgradeCost">5</span> gold)</button>
     </div>
     <h2>Shop</h2>
     <button id="buyPickaxe">Buy Pickaxe (Cost: 10 Gold)</button>
     <p>Pickaxe Level: <span id="pickaxeLevel">1</span></p>
+    <br />
+    <div id="notificationArea" class="notification-area"></div>
     
     <script src="script.js"></script>
 </body>
