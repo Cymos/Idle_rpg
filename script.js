@@ -1,3 +1,16 @@
+let totalMiningAttempts = 0;
+let stoneAttempts = 0;
+let goldAttempts = 0;
+let silverAttempts = 0;
+let stoneSuccess = 0;
+let goldSuccess = 0;
+let silverSuccess = 0;
+
+let stoneMasteryLevel = 1;
+let goldMasteryLevel = 1;
+let silverMasteryLevel = 1;
+const masteryThresholds = [10, 50, 100]; // thresholds for increasing mastery level
+
 let stone = 0;
 let gold = 0;
 let silver = 0;
@@ -18,6 +31,14 @@ function updateResources() {
     document.getElementById('stone').textContent = stone;
     document.getElementById('gold').textContent = gold;
     document.getElementById('silver').textContent = silver;
+
+    // update stats section
+    document.getElementById('statsStoneAttempts').textContent = stoneAttempts;
+    document.getElementById('masteryStone').textContent = stoneMasteryLevel;
+    document.getElementById('statsGoldAttempts').textContent = goldAttempts;
+    document.getElementById('masteryGold').textContent = goldMasteryLevel;
+    document.getElementById('statsSilverAttempts').textContent = silverAttempts;
+    document.getElementById('masterySilver').textContent = silverMasteryLevel;
 }
 
 function updateLevelInfo() {
@@ -77,6 +98,43 @@ showNotification('Congrats! You\'ve reached level 2!');
 showNotification('Not enough gold to buy the tool.', 'warning');
 showNotification('Error processiong the request.', 'error');
 */
+
+// functions to increase mastery level when thresholds are met and to provide rewards based on mastery level
+function increaseMastery(resource) {
+    let masteryLevel = 1;
+    let successCount = 0;
+
+    switch (resource) {
+        case 'stone':
+            successCount = stoneSucces;
+            masteryLevel = stoneMasteryLevel;
+            break;
+        case 'gold':
+            successCount = goldSuccess;
+            masteryLevel = goldMasteryLevel;
+            break;
+        case 'silver':
+            successCount = silverSuccess;
+            masteryLevel = silverMasteryLevel;
+            break;
+    }
+    // check mastery thresholds
+    if (successCount >= masteryThresholds[masteryLevel - 1] && masteryLevel < masteryThresholds.length) {
+        masteryLevel++;
+        switch (resource) {
+            case 'stone':
+                stoneMasteryLevel = masteryLevel;
+                break;
+            case 'gold':
+                goldMasteryLevel = masteryLevel;
+                break;
+            case 'silver':
+                silverMasteryLevel = masteryLevel;
+                break;
+        }
+        showNotification(`Congratulations! You've reached Mastery Level ${masteryLevel} for ${resource}!`, 'success');
+    }
+}
 
 // Simulate the mining process
 function mine() {
@@ -161,27 +219,30 @@ function mineResources() {
 
     switch (selectedResource) {
         case 'stone':
+            stoneAttempts++;
             if (Math.random() < getStoneChance()) {
-                stone+=pickaxeLevel*miningLevel;
-                gainXP(100);
+                stone+=(pickaxeLevel+miningLevel) * stoneMasteryLevel;
+                gainXP(100 * stoneMasteryLevel);
                 showNotification('You mined some stone!', 'success');
             } else {
                 showNotification('Mining action failed!', 'warning');
             }
             break;
         case 'gold':
+            goldAttempts++;
             if (miningLevel >= goldUnlockLevel && Math.random() < getGoldChance()) {
-                gold+=pickaxeLevel*miningLevel;
-                gainXP(2);
+                gold+=(pickaxeLevel+miningLevel * goldMasteryLevel);
+                gainXP(2 * goldMasteryLevel);
                 showNotification('You mined some gold!', 'success');
             } else {
                 showNotification('Mining gold failed or is not unlocked yet!', 'warning');
             }
             break;
         case 'silver':
+            silverAttempts++;
             if (miningLevel >= silverUnlockLevel && Math.random() < getSilverChance()) {
-                silver+=pickaxeLevel*miningLevel;
-                gainXP(1);
+                silver+=(pickaxeLevel+miningLevel)*silverMasteryLevel;
+                gainXP(3 * silverMasteryLevel);
                 showNotification('You mined some silver!', 'success');
             } else {
                 showNotification('Mining silver failed or is not unlocked yet!', 'warning');
@@ -191,20 +252,20 @@ function mineResources() {
             showNotification('Unknown resource selected!', 'error');
             break;
     }
-
     updateResources();
 }
 
 function getStoneChance() {
-    return Math.min(0.8 + (pickaxeLevel - 1) * 0.05 + (miningLevel - 1) * 0.01, 1.0);
+    // base chance is 80%, increased with mastery
+    return Math.min(0.8 + (pickaxeLevel - 1) * 0.05 + (miningLevel - 1) * 0.01 + (stoneMasteryLevel - 1) * 0.05, 1.0);
 }
 
 function getGoldChance() {
-    return Math.min(0.2 + (pickaxeLevel - 1) * 0.03 + (miningLevel - goldUnlockLevel) * 0.01, 1.0);
+    return Math.min(0.2 + (pickaxeLevel - 1) * 0.03 + (miningLevel - goldUnlockLevel) * 0.01 + (goldMasteryLevel - 1) * 0.03, 1.0);
 }
 
 function getSilverChance() {
-    return Math.min(0.5 + (pickaxeLevel - 1) * 0.02 + (miningLevel - silverUnlockLevel) * 0.01, 1.0);
+    return Math.min(0.5 + (pickaxeLevel - 1) * 0.02 + (miningLevel - silverUnlockLevel) * 0.01 + (silverMasteryLevel - 1) * 0.04, 1.0);
 }
 
 function updateSuccessChances() {
