@@ -1,5 +1,4 @@
-// define some basic variables and functions to simulate the mining process
-// define resources
+let stone = 0;
 let gold = 0;
 let silver = 0;
 let miningXP = 0;
@@ -10,8 +9,13 @@ let actions = 1; // start with 1 action
 let actionUpgradeCost = 5; // cost to upgrade actions
 let isIdleMode = true;
 
+// level that resources are unlocked at
+const goldUnlockLevel = 3;
+const silverUnlockLevel = 5;
+
 // Update the UI with the current resource counts
 function updateResources() {
+    document.getElementById('stone').textContent = stone;
     document.getElementById('gold').textContent = gold;
     document.getElementById('silver').textContent = silver;
 }
@@ -25,6 +29,15 @@ function updateLevelInfo() {
     const xpBar = document.getElementById('xpBar');
     const xpPercentage = (miningXP / xpToNextMiningLevel) * 100;
     xpBar.style.width = xpPercentage + '%';
+
+    // unlock resources based on level
+    if (level >= goldUnlockLevel) {
+        document.getElementById('goldResource').style.display = 'block';
+    }
+    if (level >= silverUnlockLevel) {
+        document.getElementById('silverResource').style.display = 'block';
+    }
+    updateSuccessChances();
 }
 
 function gainXP(amount) {
@@ -73,7 +86,6 @@ function mine() {
 }
 
 function idleMine() {
-    // disable the mine button
     const mineButton = document.getElementById('mineButton');
     mineButton.disabled = true;
 
@@ -85,22 +97,7 @@ function idleMine() {
     // loop through the number of actions and mine resources each time
     for (let i = 0; i < actions; i++) {
         setTimeout(() => {
-            const goldChance = Math.random();
-            const silverChance = Math.random();
-        
-            if (goldChance > 0.8) { // 20% chance to mine gold
-                gold++;
-                gold += pickaxeLevel * miningLevel;
-                gainXP(2); // gain more xp for gold
-            }
-        
-            if (silverChance > 0.5) { // 50% chnace to mine solver
-                silver++;
-                silver += pickaxeLevel * miningLevel;
-                gainXP(1); // gain less xp for silver
-            }
-        
-            updateResources();        
+            mineResources();        
         }, i * 6000); // mine once every 6 seconds for each action
     }
 
@@ -132,19 +129,7 @@ function manualMine() {
     const intervalTime = 100; // Updates every 0.1 seconds
     let elapsedTime = 0;
 
-    const goldChance = Math.random();
-    const silverChance = Math.random();
-
-    if (goldChance > 0.8) {
-        gold += pickaxeLevel * miningLevel;
-        gainXP(2)
-    }
-
-    if (silverChance > 0.5) {
-        silver += pickaxeLevel * miningLevel
-        gainXP(1);
-    }
-    updateResources();
+    mineResources();
 
     const manualCountdownBar = document.getElementById('manualCountdownBar');
 
@@ -163,6 +148,50 @@ function manualMine() {
             manualMineButton.textContent = `Wait ${(remainingTime / 1000).toFixed(1)} seconds`;
         }
     }, intervalTime); // update countdown bar every 100ms
+}
+
+function mineResources() {
+    const stoneChance = getStoneChance();
+    const goldChance = getGoldChance();
+    const silverChance = getSilverChance();
+
+    // Always mine stone
+    if (Math.random() < stoneChance) {
+        stone += pickaxeLevel * miningLevel;
+        gainXP(1);
+    }
+    // mine other resources only if they are unlocked
+    if (miningLevel >= goldUnlockLevel && Math.random() < goldChance) {
+        gold+=pickaxeLevel*miningLevel;
+        gainXP(2);
+    }
+    if (miningLevel >= silverUnlockLevel && Math.random() < silverChance) {
+        silver+=pickaxeLevel*miningLevel;
+        gainXP(1);
+    }
+    updateResources();
+}
+
+function getStoneChance() {
+    return Math.min(0.8 + (pickaxeLevel - 1) * 0.05 + (miningLevel - 1) * 0.01, 1.0);
+}
+
+function getGoldChance() {
+    return Math.min(0.2 + (pickaxeLevel - 1) * 0.03 + (miningLevel - goldUnlockLevel) * 0.01, 1.0);
+}
+
+function getSilverChance() {
+    return Math.min(0.5 + (pickaxeLevel - 1) * 0.02 + (miningLevel - silverUnlockLevel) * 0.01, 1.0);
+}
+
+function updateSuccessChances() {
+    document.getElementById('stoneChance').textContent = (getStoneChance() * 100).toFixed(1) + '%';
+    if (level >= goldUnlockLevel) {
+        document.getElementById('goldChance').textContent = (getGoldChance() * 100).toFixed(1) + '%';
+    }
+    if ( level >= silverUnlockLevel) {
+        document.getElementById('silverChance').textContent = (getSilverChance() * 100).toFixed(1) + '%';
+    }
 }
 
 function toggleMode() {

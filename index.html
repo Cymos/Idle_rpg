@@ -9,8 +9,11 @@
 <body>
     <h1>Mining Simulator</h1>
     <div id="resources">
-        <p>Gold: <span id="gold">0</span></p>
-        <p>Silver: <span id="silver">0</span></p>
+        <!-- Stone Resource -->
+        <p>Stone: <span id="stone">0</span> (Chance: <span id="stoneChance">80%</span>)</p>
+        <!-- resources hidden initially-->
+        <p id="goldResource" style="display:none;">Gold: <span id="gold">0</span> (Chance: <span id="goldChance">0%</span>)</p>
+        <p id="silverResource" style="display:none;">Silver: <span id="silver">0</span> (Chance: <span id="silverChance">0%</span>)</p>
     </div>
     <div id="levelinfo">
         <p>Mining Level: <span id="miningLevel">1</span></p>
