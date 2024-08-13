@@ -9,6 +9,16 @@
 <body>
     <h1>Mining Simulator</h1>
     <div id="resources">
+        <p>Choose a resource to mine:</p>
+        <label>
+            <input type="radio" name="resource" value="stone" checked> Stone
+        </label>
+        <label>
+            <input type="radio" name="resource" value="gold" disabled id="goldRadio"> Gold
+        </label>
+        <label>
+            <input type="radio" name="resource" value="silver" disabled id="silverRadio"> Silver
+        </label>
         <!-- Stone Resource -->
         <p>Stone: <span id="stone">0</span> (Chance: <span id="stoneChance">80%</span>)</p>
         <!-- resources hidden initially-->

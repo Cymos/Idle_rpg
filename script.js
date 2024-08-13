@@ -31,10 +31,12 @@ function updateLevelInfo() {
     xpBar.style.width = xpPercentage + '%';
 
     // unlock resources based on level
-    if (level >= goldUnlockLevel) {
+    if (miningLevel >= goldUnlockLevel) {
+        document.getElementById('goldRadio').disabled = false;
         document.getElementById('goldResource').style.display = 'block';
     }
-    if (level >= silverUnlockLevel) {
+    if (miningLevel >= silverUnlockLevel) {
+        document.getElementById('silverRadio').disabled = false;
         document.getElementById('silverResource').style.display = 'block';
     }
     updateSuccessChances();
@@ -151,24 +153,45 @@ function manualMine() {
 }
 
 function mineResources() {
+    const selectedResource = document.querySelector('input[name="resource"]:checked').value;
+
     const stoneChance = getStoneChance();
     const goldChance = getGoldChance();
     const silverChance = getSilverChance();
 
-    // Always mine stone
-    if (Math.random() < stoneChance) {
-        stone += pickaxeLevel * miningLevel;
-        gainXP(1);
+    switch (selectedResource) {
+        case 'stone':
+            if (Math.random() < getStoneChance()) {
+                stone+=pickaxeLevel*miningLevel;
+                gainXP(100);
+                showNotification('You mined some stone!', 'success');
+            } else {
+                showNotification('Mining action failed!', 'warning');
+            }
+            break;
+        case 'gold':
+            if (miningLevel >= goldUnlockLevel && Math.random() < getGoldChance()) {
+                gold+=pickaxeLevel*miningLevel;
+                gainXP(2);
+                showNotification('You mined some gold!', 'success');
+            } else {
+                showNotification('Mining gold failed or is not unlocked yet!', 'warning');
+            }
+            break;
+        case 'silver':
+            if (miningLevel >= silverUnlockLevel && Math.random() < getSilverChance()) {
+                silver+=pickaxeLevel*miningLevel;
+                gainXP(1);
+                showNotification('You mined some silver!', 'success');
+            } else {
+                showNotification('Mining silver failed or is not unlocked yet!', 'warning');
+            }
+            break;
+        default:
+            showNotification('Unknown resource selected!', 'error');
+            break;
     }
-    // mine other resources only if they are unlocked
-    if (miningLevel >= goldUnlockLevel && Math.random() < goldChance) {
-        gold+=pickaxeLevel*miningLevel;
-        gainXP(2);
-    }
-    if (miningLevel >= silverUnlockLevel && Math.random() < silverChance) {
-        silver+=pickaxeLevel*miningLevel;
-        gainXP(1);
-    }
+
     updateResources();
 }
 
@@ -186,10 +209,10 @@ function getSilverChance() {
 
 function updateSuccessChances() {
     document.getElementById('stoneChance').textContent = (getStoneChance() * 100).toFixed(1) + '%';
-    if (level >= goldUnlockLevel) {
+    if (miningLevel >= goldUnlockLevel) {
         document.getElementById('goldChance').textContent = (getGoldChance() * 100).toFixed(1) + '%';
     }
-    if ( level >= silverUnlockLevel) {
+    if (miningLevel >= silverUnlockLevel) {
         document.getElementById('silverChance').textContent = (getSilverChance() * 100).toFixed(1) + '%';
     }
 }
